@@ -1,0 +1,37 @@
+{
+  "name": "lib-lequel",
+  "version": "1.0.0",
+  "description": "Simple Database query abstraction library lescapes style",
+  "main": "/lib/",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-http": "^3.0.0",
+    "mocha": "^3.2.0",
+    "nodemon": "^1.11.0",
+    "rewire": "^2.5.2"
+  },
+  "engines": {
+    "node": "7.8.0",
+    "yarn": "^0.22.0"
+  },
+  "dependencies": {
+    "eslint": "^4.0.0",
+    "pg": "^6.2.4",
+    "pg-pool": "^1.7.1",
+    "postgrator": "^2.10.0",
+    "url": "^0.11.0"
+  },
+  "scripts": {
+    "test": "./node_modules/mocha/bin/mocha -t 10000 --recursive"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brandsExclusive/lib-lequel.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/brandsExclusive/lib-lequel/issues"
+  },
+  "homepage": "https://github.com/brandsExclusive/lib-lequel#readme"
+}
