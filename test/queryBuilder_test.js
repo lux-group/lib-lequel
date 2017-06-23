@@ -123,6 +123,46 @@ describe('queryBuilder', function() {
         ,["cavendish","alchemist","ape"]]).to.eql(query.finalize());
     });
 
+    it('should compose where like', function() {
+      query = queryBuilder();
+      query.from("sports");
+      query.where("name","like", "football");
+      expect([
+        " SELECT *  FROM sports  WHERE  name like $1 "
+        ,["%football%"]]).to.eql(query.finalize());
+    });
+
+    it('should compose where ilike', function() {
+      query = queryBuilder();
+      query.from("sports");
+      query.where("name","ilike", "Football");
+      expect([
+        " SELECT *  FROM sports  WHERE  name ilike $1 "
+        ,["%Football%"]]).to.eql(query.finalize());
+    });
+
+    it('should compose multiple where in  with where like and where equals', function() {
+      query = queryBuilder();
+      query.from("banana");
+      query.where("species","in", ['cavendish','alchemist']);
+      query.where("feeder","=", 'ape');
+      query.where("name","like", "Football");
+      expect([
+        " SELECT *  FROM banana  WHERE  species in ($1,$2)  AND  feeder = $3  AND  name like $4 "
+        ,["cavendish","alchemist","ape","%Football%"]]).to.eql(query.finalize());
+    });
+
+    it('should compose multiple where in  with where ilike and where equals', function() {
+      query = queryBuilder();
+      query.from("banana");
+      query.where("species","in", ['cavendish','alchemist']);
+      query.where("feeder","=", 'ape');
+      query.where("name","ilike", "Football");
+      expect([
+        " SELECT *  FROM banana  WHERE  species in ($1,$2)  AND  feeder = $3  AND  name ilike $4 "
+        ,["cavendish","alchemist","ape","%Football%"]]).to.eql(query.finalize());
+    });
+
     it('should clone into separate queries', function() {
       query = queryBuilder();
       query.from("banana");
