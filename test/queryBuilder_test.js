@@ -211,7 +211,7 @@ describe('queryBuilder', function() {
         ,["cavendish","alchemist","ape"]]).to.eql(query.finalize());
     });
 
-    it('should compose custom select fields and several orders', function() {
+    it('should compose custom select fields and several orders with order by function', function() {
       query = queryBuilder();
       query.from("banana");
       query.select(["first_name"]);
