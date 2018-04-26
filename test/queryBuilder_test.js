@@ -141,6 +141,14 @@ describe('queryBuilder', function() {
         ,["%Football%"]]).to.eql(query.finalize());
     });
 
+    it('should compose where IS NULL', function() {
+      query = queryBuilder();
+      query.from("sports");
+      query.where("name","IS", "NULL");
+      expect([
+        " SELECT * FROM sports  WHERE name IS NULL",[]]).to.eql(query.finalize());
+    });
+
     it('should compose multiple where in  with where like and where equals', function() {
       query = queryBuilder();
       query.from("banana");
@@ -196,7 +204,7 @@ describe('queryBuilder', function() {
         " SELECT first_name, last_name FROM banana  WHERE  species in ($1,$2)  AND  feeder = $3 "
         ,["cavendish","alchemist","ape"]]).to.eql(query.finalize());
     });
-    
+
     it('should compose custom select fields and several orders', function() {
       query = queryBuilder();
       query.from("banana");
