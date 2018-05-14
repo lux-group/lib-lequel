@@ -234,6 +234,52 @@ describe('queryBuilder', function() {
         ,["cavendish","alchemist","ape"]]).to.eql(query.finalize());
     });
 
+    it('should compose all query types and full text search', function() {
+      query = queryBuilder();
+      query.from("banana");
+      query.orderBy("species", "ASC");
+      query.where("species","=", "cavendish");
+      query.where("state","=", "ripe");
+      query.fullTextSearch(['name'], 'Test Name', 'DESC');
+      second_query = query.clone();
+      second_query.count();
+      query.paginate(5, 5);
+
+      expect([" SELECT * FROM banana  ,plainto_tsquery('Test Name') AS to_tsquery_query  WHERE  species = $1  AND  state = $2  AND make_tsvector(name) @@ to_tsquery_query ORDER BY species ASC, ts_rank(make_tsvector(name), to_tsquery_query) DESC LIMIT 5 OFFSET 20 " , ["cavendish", "ripe"]]).to.eql(query.finalize());
+      expect([" SELECT COUNT(*) FROM banana  ,plainto_tsquery('Test Name') AS to_tsquery_query  WHERE  species = $1  AND  state = $2  AND make_tsvector(name) @@ to_tsquery_query",["cavendish", "ripe"]]).to.eql(second_query.finalize());
+    });
+    
+    it('should compose all query types and full text search without order', function() {
+      query = queryBuilder();
+      query.from("banana");
+      query.orderBy("species", "ASC");
+      query.where("species","=", "cavendish");
+      query.where("state","=", "ripe");
+      query.fullTextSearch(['name'], 'Test Name');
+      second_query = query.clone();
+      second_query.count();
+      query.paginate(5, 5);
+
+      expect([" SELECT * FROM banana  ,plainto_tsquery('Test Name') AS to_tsquery_query  WHERE  species = $1  AND  state = $2  AND make_tsvector(name) @@ to_tsquery_query ORDER BY species ASC LIMIT 5 OFFSET 20 " , ["cavendish", "ripe"]]).to.eql(query.finalize());
+      expect([" SELECT COUNT(*) FROM banana  ,plainto_tsquery('Test Name') AS to_tsquery_query  WHERE  species = $1  AND  state = $2  AND make_tsvector(name) @@ to_tsquery_query",["cavendish", "ripe"]]).to.eql(second_query.finalize());
+    });
+
+    it('should compose all query types and full text search and add schema', function() {
+      query = queryBuilder();
+      query.schema("test_schema");
+      query.from("banana");
+      query.orderBy("species", "ASC");
+      query.where("species","=", "cavendish");
+      query.where("state","=", "ripe");
+      query.fullTextSearch(['name'], 'Test Name', 'DESC');
+      second_query = query.clone();
+      second_query.count();
+      query.paginate(5, 5);
+
+      expect([" SELECT * FROM test_schema.banana  ,plainto_tsquery('Test Name') AS to_tsquery_query  WHERE  species = $1  AND  state = $2  AND test_schema.make_tsvector(name) @@ to_tsquery_query ORDER BY species ASC, ts_rank(test_schema.make_tsvector(name), to_tsquery_query) DESC LIMIT 5 OFFSET 20 " , ["cavendish", "ripe"]]).to.eql(query.finalize());
+      expect([" SELECT COUNT(*) FROM test_schema.banana  ,plainto_tsquery('Test Name') AS to_tsquery_query  WHERE  species = $1  AND  state = $2  AND test_schema.make_tsvector(name) @@ to_tsquery_query",["cavendish", "ripe"]]).to.eql(second_query.finalize());
+    });
+
     it('test injection', function() {
       query = queryBuilder();
       query.from("banana");
