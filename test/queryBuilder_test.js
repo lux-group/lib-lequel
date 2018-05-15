@@ -230,8 +230,8 @@ describe('queryBuilder', function() {
       query.addOrderBy("first_name", "DESC");
       query.addOrderByFunction('similarity', 'species', ['cavendish'], 'DESC')
       expect([
-        " SELECT first_name, last_name FROM banana  WHERE  species in ($1,$2)  AND  feeder = $3  ORDER BY species ASC, first_name DESC, similarity(species, 'cavendish') DESC"
-        ,["cavendish","alchemist","ape"]]).to.eql(query.finalize());
+        " SELECT first_name, last_name FROM banana  WHERE  species in ($1,$2)  AND  feeder = $3  ORDER BY species ASC, first_name DESC, similarity(species, $4) DESC"
+        ,["cavendish","alchemist","ape", "cavendish"]]).to.eql(query.finalize());
     });
 
     it('should compose all query types and full text search', function() {
@@ -291,8 +291,8 @@ describe('queryBuilder', function() {
       query.addOrderBy("first_name", "DESC");
       query.addOrderByFunction('similarity', 'species', ['\'; (select * from banana);'], 'DESC')
       expect([
-        " SELECT first_name, last_name FROM banana  WHERE  species in ($1,$2)  AND  feeder = $3  ORDER BY species ASC, first_name DESC, similarity(species, '''; (select * from banana);') DESC"
-        ,["cavendish","alchemist","ape"]]).to.eql(query.finalize());
+        " SELECT first_name, last_name FROM banana  WHERE  species in ($1,$2)  AND  feeder = $3  ORDER BY species ASC, first_name DESC, similarity(species, $4) DESC"
+        ,["cavendish","alchemist","ape",'\'; (select * from banana);']]).to.eql(query.finalize());
     });
 
   });
