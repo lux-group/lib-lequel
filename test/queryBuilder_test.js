@@ -245,8 +245,8 @@ describe('queryBuilder', function() {
       second_query.count();
       query.paginate(5, 5);
 
-      expect([" SELECT * FROM banana  ,plainto_tsquery('Test Name') AS to_tsquery_query  WHERE  species = $1  AND  state = $2  AND make_tsvector(name) @@ to_tsquery_query ORDER BY species ASC, ts_rank(make_tsvector(name), to_tsquery_query) DESC LIMIT 5 OFFSET 20 " , ["cavendish", "ripe"]]).to.eql(query.finalize());
-      expect([" SELECT COUNT(*) FROM banana  ,plainto_tsquery('Test Name') AS to_tsquery_query  WHERE  species = $1  AND  state = $2  AND make_tsvector(name) @@ to_tsquery_query",["cavendish", "ripe"]]).to.eql(second_query.finalize());
+      expect([" SELECT * FROM banana  ,plainto_tsquery($1) AS to_tsquery_query  WHERE  species = $2  AND  state = $3  AND make_tsvector(name) @@ to_tsquery_query ORDER BY species ASC, ts_rank(make_tsvector(name), to_tsquery_query) DESC LIMIT 5 OFFSET 20 " , ["Test Name", "cavendish", "ripe"]]).to.eql(query.finalize());
+      expect([" SELECT COUNT(*) FROM banana  ,plainto_tsquery($1) AS to_tsquery_query  WHERE  species = $2  AND  state = $3  AND make_tsvector(name) @@ to_tsquery_query",["Test Name", "cavendish", "ripe"]]).to.eql(second_query.finalize());
     });
     
     it('should compose all query types and full text search without order', function() {
@@ -260,8 +260,8 @@ describe('queryBuilder', function() {
       second_query.count();
       query.paginate(5, 5);
 
-      expect([" SELECT * FROM banana  ,plainto_tsquery('Test Name') AS to_tsquery_query  WHERE  species = $1  AND  state = $2  AND make_tsvector(name) @@ to_tsquery_query ORDER BY species ASC LIMIT 5 OFFSET 20 " , ["cavendish", "ripe"]]).to.eql(query.finalize());
-      expect([" SELECT COUNT(*) FROM banana  ,plainto_tsquery('Test Name') AS to_tsquery_query  WHERE  species = $1  AND  state = $2  AND make_tsvector(name) @@ to_tsquery_query",["cavendish", "ripe"]]).to.eql(second_query.finalize());
+      expect([" SELECT * FROM banana  ,plainto_tsquery($1) AS to_tsquery_query  WHERE  species = $2  AND  state = $3  AND make_tsvector(name) @@ to_tsquery_query ORDER BY species ASC LIMIT 5 OFFSET 20 " , ["Test Name", "cavendish", "ripe"]]).to.eql(query.finalize());
+      expect([" SELECT COUNT(*) FROM banana  ,plainto_tsquery($1) AS to_tsquery_query  WHERE  species = $2  AND  state = $3  AND make_tsvector(name) @@ to_tsquery_query",["Test Name", "cavendish", "ripe"]]).to.eql(second_query.finalize());
     });
 
     it('should compose all query types and full text search and add schema', function() {
@@ -276,8 +276,8 @@ describe('queryBuilder', function() {
       second_query.count();
       query.paginate(5, 5);
 
-      expect([" SELECT * FROM test_schema.banana  ,plainto_tsquery('Test Name') AS to_tsquery_query  WHERE  species = $1  AND  state = $2  AND test_schema.make_tsvector(name) @@ to_tsquery_query ORDER BY species ASC, ts_rank(test_schema.make_tsvector(name), to_tsquery_query) DESC LIMIT 5 OFFSET 20 " , ["cavendish", "ripe"]]).to.eql(query.finalize());
-      expect([" SELECT COUNT(*) FROM test_schema.banana  ,plainto_tsquery('Test Name') AS to_tsquery_query  WHERE  species = $1  AND  state = $2  AND test_schema.make_tsvector(name) @@ to_tsquery_query",["cavendish", "ripe"]]).to.eql(second_query.finalize());
+      expect([" SELECT * FROM test_schema.banana  ,plainto_tsquery($1) AS to_tsquery_query  WHERE  species = $2  AND  state = $3  AND test_schema.make_tsvector(name) @@ to_tsquery_query ORDER BY species ASC, ts_rank(test_schema.make_tsvector(name), to_tsquery_query) DESC LIMIT 5 OFFSET 20 " , ["Test Name", "cavendish", "ripe"]]).to.eql(query.finalize());
+      expect([" SELECT COUNT(*) FROM test_schema.banana  ,plainto_tsquery($1) AS to_tsquery_query  WHERE  species = $2  AND  state = $3  AND test_schema.make_tsvector(name) @@ to_tsquery_query",["Test Name", "cavendish", "ripe"]]).to.eql(second_query.finalize());
     });
 
     it('test injection', function() {
