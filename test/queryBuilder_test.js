@@ -230,8 +230,54 @@ describe('queryBuilder', function() {
       query.addOrderBy("first_name", "DESC");
       query.addOrderByFunction('similarity', 'species', ['cavendish'], 'DESC')
       expect([
-        " SELECT first_name, last_name FROM banana  WHERE  species in ($1,$2)  AND  feeder = $3  ORDER BY species ASC, first_name DESC, similarity(species, 'cavendish') DESC"
-        ,["cavendish","alchemist","ape"]]).to.eql(query.finalize());
+        " SELECT first_name, last_name FROM banana  WHERE  species in ($1,$2)  AND  feeder = $3  ORDER BY species ASC, first_name DESC, similarity(species, $4) DESC"
+        ,["cavendish","alchemist","ape", "cavendish"]]).to.eql(query.finalize());
+    });
+
+    it('should compose all query types and full text search', function() {
+      query = queryBuilder();
+      query.from("banana");
+      query.orderBy("species", "ASC");
+      query.where("species","=", "cavendish");
+      query.where("state","=", "ripe");
+      query.fullTextSearch(['name'], 'Test Name', 'DESC');
+      second_query = query.clone();
+      second_query.count();
+      query.paginate(5, 5);
+
+      expect([" SELECT * FROM banana  ,plainto_tsquery($1) AS to_tsquery_query  WHERE  species = $2  AND  state = $3  AND make_tsvector(name) @@ to_tsquery_query ORDER BY species ASC, ts_rank(make_tsvector(name), to_tsquery_query) DESC LIMIT 5 OFFSET 20 " , ["Test Name", "cavendish", "ripe"]]).to.eql(query.finalize());
+      expect([" SELECT COUNT(*) FROM banana  ,plainto_tsquery($1) AS to_tsquery_query  WHERE  species = $2  AND  state = $3  AND make_tsvector(name) @@ to_tsquery_query",["Test Name", "cavendish", "ripe"]]).to.eql(second_query.finalize());
+    });
+    
+    it('should compose all query types and full text search without order', function() {
+      query = queryBuilder();
+      query.from("banana");
+      query.orderBy("species", "ASC");
+      query.where("species","=", "cavendish");
+      query.where("state","=", "ripe");
+      query.fullTextSearch(['name'], 'Test Name');
+      second_query = query.clone();
+      second_query.count();
+      query.paginate(5, 5);
+
+      expect([" SELECT * FROM banana  ,plainto_tsquery($1) AS to_tsquery_query  WHERE  species = $2  AND  state = $3  AND make_tsvector(name) @@ to_tsquery_query ORDER BY species ASC LIMIT 5 OFFSET 20 " , ["Test Name", "cavendish", "ripe"]]).to.eql(query.finalize());
+      expect([" SELECT COUNT(*) FROM banana  ,plainto_tsquery($1) AS to_tsquery_query  WHERE  species = $2  AND  state = $3  AND make_tsvector(name) @@ to_tsquery_query",["Test Name", "cavendish", "ripe"]]).to.eql(second_query.finalize());
+    });
+
+    it('should compose all query types and full text search and add schema', function() {
+      query = queryBuilder();
+      query.schema("test_schema");
+      query.from("banana");
+      query.orderBy("species", "ASC");
+      query.where("species","=", "cavendish");
+      query.where("state","=", "ripe");
+      query.fullTextSearch(['name'], 'Test Name', 'DESC');
+      second_query = query.clone();
+      second_query.count();
+      query.paginate(5, 5);
+
+      expect([" SELECT * FROM test_schema.banana  ,plainto_tsquery($1) AS to_tsquery_query  WHERE  species = $2  AND  state = $3  AND test_schema.make_tsvector(name) @@ to_tsquery_query ORDER BY species ASC, ts_rank(test_schema.make_tsvector(name), to_tsquery_query) DESC LIMIT 5 OFFSET 20 " , ["Test Name", "cavendish", "ripe"]]).to.eql(query.finalize());
+      expect([" SELECT COUNT(*) FROM test_schema.banana  ,plainto_tsquery($1) AS to_tsquery_query  WHERE  species = $2  AND  state = $3  AND test_schema.make_tsvector(name) @@ to_tsquery_query",["Test Name", "cavendish", "ripe"]]).to.eql(second_query.finalize());
     });
 
     it('test injection', function() {
@@ -245,8 +291,8 @@ describe('queryBuilder', function() {
       query.addOrderBy("first_name", "DESC");
       query.addOrderByFunction('similarity', 'species', ['\'; (select * from banana);'], 'DESC')
       expect([
-        " SELECT first_name, last_name FROM banana  WHERE  species in ($1,$2)  AND  feeder = $3  ORDER BY species ASC, first_name DESC, similarity(species, '''; (select * from banana);') DESC"
-        ,["cavendish","alchemist","ape"]]).to.eql(query.finalize());
+        " SELECT first_name, last_name FROM banana  WHERE  species in ($1,$2)  AND  feeder = $3  ORDER BY species ASC, first_name DESC, similarity(species, $4) DESC"
+        ,["cavendish","alchemist","ape",'\'; (select * from banana);']]).to.eql(query.finalize());
     });
 
   });
