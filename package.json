@@ -1,8 +1,8 @@
 {
   "name": "lib-lequel",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "description": "Simple Database query abstraction library lescapes style",
-  "main": "/lib/",
+  "main": "lib/index.js",
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-http": "^3.0.0",
@@ -12,9 +12,9 @@
   },
   "dependencies": {
     "eslint": "^4.0.0",
-    "pg": "^6.2.4",
+    "pg": "^8.7.1",
     "pg-escape": "^0.2.0",
-    "pg-pool": "^2.0.3",
+    "pg-pool": "^3.4.1",
     "postgrator": "^2.10.0",
     "url": "^0.11.0"
   },
