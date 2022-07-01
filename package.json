@@ -1,6 +1,6 @@
 {
   "name": "@luxuryescapes/lib-lequel",
-  "version": "5.0.1",
+  "version": "5.0.2",
   "description": "Simple Database query abstraction library lescapes style",
   "main": "lib/index.js",
   "devDependencies": {
