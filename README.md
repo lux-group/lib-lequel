@@ -1,3 +1,11 @@
+# Deprecated
+
+We recommed you migrate away from lib-lequel. It hasn't been maintained in years. Our most common ORM is Sequelize.
+
+- Joss Paling, March 2024
+
+
+
 leQuel Library
 ===
 
